@@ -1,0 +1,23 @@
+{
+  "name": "Gayatree Nivas",
+  "tagline": "Tranquil Home Away From Home in Puri",
+  "theme": "classic",
+  "primaryColor": "#b45309",
+  "contact": {
+    "phone": "+91 98765 43210",
+    "whatsapp": "+919876543210",
+    "email": "bookings@gayatreenivas.com",
+    "address": "Near Jagannath Temple Road, Puri, Odisha 752001"
+  },
+  "map": {
+    "lat": 19.8135,
+    "lng": 85.8312,
+    "zoom": 15
+  },
+  "featureFlags": {
+    "enableReviews": true,
+    "enableGallery": true,
+    "enableOwnerPortal": true,
+    "enableFaq": true
+  }
+}

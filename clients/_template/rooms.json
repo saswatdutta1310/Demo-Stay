@@ -1,0 +1,16 @@
+[
+  {
+    "id": "deluxe-room",
+    "name": "Deluxe Room",
+    "slug": "deluxe-room",
+    "price": 2000,
+    "capacity": 2,
+    "unitsAvailable": 5,
+    "description": "Bright and airy room with modern amenities, comfortable double bed, and attached bathroom.",
+    "amenities": ["Air Conditioning", "Free Wi-Fi", "Geyser", "Smart TV", "Daily Housekeeping"],
+    "images": [
+      "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "bedType": "Queen Bed"
+  }
+]

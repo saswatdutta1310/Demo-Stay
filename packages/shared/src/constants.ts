@@ -1,0 +1,25 @@
+export enum BookingStatus {
+  HOLD = "HOLD",
+  CONFIRMED = "CONFIRMED",
+  CHECKED_IN = "CHECKED_IN",
+  CHECKED_OUT = "CHECKED_OUT",
+  CANCELLED = "CANCELLED",
+  EXPIRED = "EXPIRED"
+}
+
+export enum PaymentStatus {
+  PENDING = "PENDING",
+  SUCCESS = "SUCCESS",
+  FAILED = "FAILED",
+  REFUNDED = "REFUNDED"
+}
+
+export enum IDType {
+  AADHAAR = "AADHAAR",
+  PASSPORT = "PASSPORT",
+  VOTER_ID = "VOTER_ID",
+  DRIVING_LICENSE = "DRIVING_LICENSE"
+}
+
+export const DEFAULT_HOLD_DURATION_MINUTES = 15;
+export const DEFAULT_TAX_PERCENTAGE = 12; // 12% GST standard

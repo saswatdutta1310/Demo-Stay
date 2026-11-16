@@ -1,0 +1,11 @@
+{
+  "checkInTime": "12:00 PM",
+  "checkOutTime": "11:00 AM",
+  "cancellation": "Free cancellation up to 48 hours before check-in. Cancellations within 48 hours are non-refundable.",
+  "idRules": [
+    "Government approved photo ID is mandatory for all adult guests (Aadhaar, Passport, Driving License, Voter ID).",
+    "PAN cards are not accepted as valid identity proof."
+  ],
+  "coupleRules": "Couples welcome with valid individual photo identification.",
+  "childRules": "Children up to 5 years stay free using existing bedding."
+}

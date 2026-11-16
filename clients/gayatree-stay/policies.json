@@ -1,0 +1,11 @@
+{
+  "checkInTime": "12:00 PM",
+  "checkOutTime": "11:00 AM",
+  "cancellation": "100% full refund if cancelled up to 48 hours prior to check-in. Cancellations within 48 hours are non-refundable.",
+  "idRules": [
+    "Valid government-issued photo ID required for every adult guest (Aadhaar, Passport, Driving License, or Voter ID).",
+    "Physical or original DigiLocker verification accepted."
+  ],
+  "coupleRules": "Couples are welcomed with valid individual photo ID proofs.",
+  "childRules": "Children under 6 years stay free with existing bedding."
+}

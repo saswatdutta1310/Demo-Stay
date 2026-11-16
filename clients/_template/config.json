@@ -1,0 +1,23 @@
+{
+  "name": "Hotel Demo Template",
+  "tagline": "Comfortable Stay & Authentic Hospitality",
+  "theme": "modern",
+  "primaryColor": "#0f766e",
+  "contact": {
+    "phone": "+91 98000 00000",
+    "whatsapp": "+919800000000",
+    "email": "contact@hoteldemo.com",
+    "address": "123 Heritage Road, Demo City, India"
+  },
+  "map": {
+    "lat": 19.8135,
+    "lng": 85.8312,
+    "zoom": 15
+  },
+  "featureFlags": {
+    "enableReviews": true,
+    "enableGallery": true,
+    "enableOwnerPortal": true,
+    "enableFaq": true
+  }
+}

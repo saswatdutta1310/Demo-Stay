@@ -1,0 +1,48 @@
+{
+  "about": "Gayatree Nivas is a peaceful family-run guest house situated in Puri, Odisha. Designed for devotees visiting Lord Jagannath Temple and families desiring a tranquil coastal retreat with clean accommodations and personalized care.",
+  "faqs": [
+    {
+      "question": "How far is Gayatree Nivas from Jagannath Temple?",
+      "answer": "We are located approximately 1 km away, an easy 12-minute walk or a 5-minute e-rickshaw ride."
+    },
+    {
+      "question": "Is car parking available?",
+      "answer": "Yes, we offer secure private parking for guest vehicles on-site."
+    },
+    {
+      "question": "Is hot water available 24/7?",
+      "answer": "Yes, all attached bathrooms are equipped with electric geysers."
+    }
+  ],
+  "nearbyPlaces": [
+    {
+      "name": "Shree Jagannath Temple",
+      "distance": "1.0 km (12 mins walk)",
+      "type": "Spiritual"
+    },
+    {
+      "name": "Golden Beach & Promenade",
+      "distance": "1.8 km (7 mins drive)",
+      "type": "Attraction"
+    },
+    {
+      "name": "Puri Railway Station",
+      "distance": "2.2 km (8 mins drive)",
+      "type": "Transit"
+    }
+  ],
+  "testimonials": [
+    {
+      "guest": "Aarav Sharma",
+      "city": "Bhubaneswar",
+      "rating": 5,
+      "comment": "The atmosphere is very peaceful and pure. The rooms are spotless and close to the temple."
+    },
+    {
+      "guest": "Suman & Rajesh Mohanty",
+      "city": "Rourkela",
+      "rating": 5,
+      "comment": "Booking directly through their website was smooth and got us the best rates."
+    }
+  ]
+}
