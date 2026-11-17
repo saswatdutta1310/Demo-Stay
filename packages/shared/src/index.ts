@@ -6,7 +6,8 @@ import {
   ContentConfigSchema,
   GuestSchema,
   PaymentSchema,
-  BookingSchema
+  BookingSchema,
+  GuestDetailsFormSchema
 } from "./schemas/client.schema";
 
 export * from "./constants";
@@ -23,6 +24,7 @@ export type Guest = z.infer<typeof GuestSchema>;
 export type Payment = z.infer<typeof PaymentSchema>;
 export type PaymentRecord = Payment;
 export type Booking = z.infer<typeof BookingSchema>;
+export type GuestDetailsForm = z.infer<typeof GuestDetailsFormSchema>;
 
 export interface FeedbackSubmission {
   id?: string;

@@ -47,3 +47,10 @@ export function calculateTotal(
     total
   };
 }
+
+/**
+ * Formats a monetary number in Indian Rupee format (e.g. ₹2,614)
+ */
+export function formatCurrencyINR(amount: number): string {
+  return `₹${amount.toLocaleString("en-IN")}`;
+}

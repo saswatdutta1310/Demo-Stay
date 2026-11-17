@@ -192,6 +192,27 @@ export const ContentConfigSchema = z.object({
   ).default([])
 }).catchall(z.unknown());
 
+export const GuestDetailsFormSchema = z.object({
+  guestName: z.string().min(2, "Full name must be at least 2 characters"),
+  guestPhone: z
+    .string()
+    .min(10, "Phone number must be at least 10 digits")
+    .regex(/^[0-9+ -]{10,15}$/, "Please enter a valid phone number"),
+  guestEmail: z.string().email("Please enter a valid email address"),
+  idType: z.enum(ACCEPTED_ID_TYPES, {
+    errorMap: () => ({ message: "Please select an accepted government ID type" })
+  }),
+  isAdult: z.literal(true, {
+    errorMap: () => ({ message: "Primary guest must be 18+ years of age" })
+  }),
+  acceptsPolicies: z.literal(true, {
+    errorMap: () => ({
+      message: "You must accept the property rules (no male-only groups, no local IDs)"
+    })
+  }),
+  specialRequests: z.string().optional()
+});
+
 export const GuestSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(1),
