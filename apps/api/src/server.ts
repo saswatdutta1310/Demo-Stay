@@ -2,17 +2,16 @@ import { app } from "./app";
 import { env } from "./config/env";
 import cron from "node-cron";
 import { prisma } from "./utils/db";
-import { BookingStatus } from "@hotel-demo/shared";
 
-// Periodic cleanup of expired holds
-cron.schedule("*/2 * * * *", async () => {
+// Periodic cleanup of expired holds every minute
+cron.schedule("* * * * *", async () => {
   try {
     const expired = await prisma.booking.updateMany({
       where: {
-        status: BookingStatus.PENDING,
+        status: { in: ["PENDING", "HOLD"] },
         expiresAt: { lte: new Date() }
       },
-      data: { status: BookingStatus.EXPIRED }
+      data: { status: "EXPIRED" }
     });
     if (expired.count > 0) {
       console.log(`⏰ Released ${expired.count} expired booking hold(s).`);

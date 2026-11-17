@@ -1,73 +1,248 @@
+import crypto from "crypto";
 import { prisma } from "../utils/db";
-import { BookingStatus } from "@hotel-demo/shared";
 import { PricingService } from "./pricing.service";
-import { env } from "../config/env";
+import { AvailabilityService } from "./availability.service";
+import { loadClientData } from "../config/client";
+
+export interface CreateBookingInput {
+  roomTypeId: string;
+  checkIn: string; // ISO string or YYYY-MM-DD
+  checkOut: string;
+  adults: number;
+  children?: number;
+  guest: {
+    name: string;
+    phone: string;
+    email: string;
+    idType: string;
+    idLast4?: string;
+    isMaleOnlyGroup?: boolean;
+    isPrimaryGuestAdult?: boolean;
+  };
+  specialRequests?: string;
+  paymentMode?: string;
+}
+
+export class HttpError extends Error {
+  status: number;
+  constructor(status: number, message: string) {
+    super(message);
+    this.status = status;
+    Object.setPrototypeOf(this, HttpError.prototype);
+  }
+}
 
 export class BookingService {
-  static async createHeldBooking(data: {
-    roomId: string;
-    checkIn: string;
-    checkOut: string;
-    guestName: string;
-    guestEmail: string;
-    guestPhone: string;
-    guestsCount: number;
-    specialRequests?: string;
-  }) {
-    const checkIn = new Date(data.checkIn);
-    const checkOut = new Date(data.checkOut);
+  /**
+   * Generates unique booking code like GS-XXXXXX
+   */
+  static generateBookingCode(): string {
+    const random = crypto.randomBytes(3).toString("hex").toUpperCase();
+    return `GS-${random}`;
+  }
 
+  /**
+   * Creates a pending booking with a 10-minute hold in ONE single database transaction.
+   * Re-checks availability, calculates pricing on server (ignoring client amount),
+   * and enforces hotel policy rules.
+   */
+  static async createBooking(input: CreateBookingInput) {
+    const { roomTypeId, checkIn, checkOut, adults, children = 0, guest, specialRequests, paymentMode = "ONLINE" } = input;
+
+    // Policy Validation
+    if (guest.isPrimaryGuestAdult === false) {
+      throw new HttpError(400, "Primary guest must be at least 18 years old");
+    }
+
+    if (guest.isMaleOnlyGroup === true) {
+      throw new HttpError(400, "Male-only groups are not permitted as per property policy");
+    }
+
+    let acceptedIds: string[] = ["Passport", "Aadhaar", "Driving License", "Govt ID"];
+    try {
+      const client = loadClientData();
+      if (client?.policies?.acceptedIdTypes && client.policies.acceptedIdTypes.length > 0) {
+        acceptedIds = client.policies.acceptedIdTypes;
+      }
+    } catch {
+      // fallback to standard default
+    }
+
+    if (!acceptedIds.map((t: string) => t.toLowerCase()).includes(guest.idType.toLowerCase())) {
+      throw new HttpError(400, `Invalid ID type. Accepted types: ${acceptedIds.join(", ")}`);
+    }
+
+    const dIn = new Date(checkIn);
+    const dOut = new Date(checkOut);
+
+    if (isNaN(dIn.getTime()) || isNaN(dOut.getTime()) || dOut <= dIn) {
+      throw new HttpError(400, "Invalid check-in or check-out dates");
+    }
+
+    // Execute in ONE transaction
     return await prisma.$transaction(async (tx) => {
-      const roomType = await tx.roomType.findUnique({ where: { id: data.roomId } });
-      if (!roomType) throw new Error("Room not found");
+      // 1. Fetch RoomType
+      const roomType = await tx.roomType.findFirst({
+        where: {
+          OR: [{ id: roomTypeId }, { slug: roomTypeId }]
+        }
+      });
 
-      const { nights, baseAmount, taxAmount, totalAmount } = PricingService.calculatePrice(
-        roomType.basePrice,
-        checkIn,
-        checkOut
-      );
+      if (!roomType) {
+        throw new HttpError(404, "Room type not found");
+      }
 
-      // Find or create Guest
-      let guest = await tx.guest.findFirst({ where: { phone: data.guestPhone } });
-      if (!guest) {
-        guest = await tx.guest.create({
+      if (adults + children > roomType.maxGuests) {
+        throw new HttpError(400, `Guests exceed maximum capacity of ${roomType.maxGuests} for this room`);
+      }
+
+      // 2. Re-check availability within transaction
+      const isAvailable = await AvailabilityService.isRoomTypeAvailable(roomType.id, dIn, dOut);
+      if (!isAvailable) {
+        throw new HttpError(409, "Selected room type is not available for the requested dates");
+      }
+
+      // 3. Compute price on server (ignoring client amount)
+      const pricing = await PricingService.calculateStayPrice(roomType.id, dIn, dOut);
+
+      // 4. Create or update Guest
+      let dbGuest = await tx.guest.findFirst({
+        where: { phone: guest.phone }
+      });
+
+      if (!dbGuest) {
+        dbGuest = await tx.guest.create({
           data: {
-            name: data.guestName,
-            email: data.guestEmail,
-            phone: data.guestPhone
+            name: guest.name,
+            phone: guest.phone,
+            email: guest.email,
+            idType: guest.idType,
+            idLast4: guest.idLast4 || null
+          }
+        });
+      } else {
+        dbGuest = await tx.guest.update({
+          where: { id: dbGuest.id },
+          data: {
+            name: guest.name,
+            email: guest.email,
+            idType: guest.idType,
+            idLast4: guest.idLast4 || dbGuest.idLast4
           }
         });
       }
 
-      const code = `DS-${Math.floor(1000 + Math.random() * 9000)}`;
-      const expiresAt = new Date(Date.now() + env.HOLD_EXPIRY_MINUTES * 60 * 1000);
+      // 5. Generate unique code
+      let code = BookingService.generateBookingCode();
+      let exists = await tx.booking.findUnique({ where: { code } });
+      while (exists) {
+        code = BookingService.generateBookingCode();
+        exists = await tx.booking.findUnique({ where: { code } });
+      }
+
+      // 6. 10-minute hold
+      const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
       const booking = await tx.booking.create({
         data: {
           code,
           roomTypeId: roomType.id,
-          guestId: guest.id,
-          checkIn,
-          checkOut,
-          adults: data.guestsCount,
-          children: 0,
-          subtotal: baseAmount,
-          tax: taxAmount,
-          total: totalAmount,
-          status: BookingStatus.PENDING,
+          guestId: dbGuest.id,
+          checkIn: dIn,
+          checkOut: dOut,
+          adults,
+          children,
+          subtotal: pricing.subtotal,
+          tax: pricing.tax,
+          total: pricing.total,
+          status: "PENDING",
+          paymentMode,
           expiresAt,
-          specialRequests: data.specialRequests
+          specialRequests
         },
-        include: { roomType: true, guest: true }
+        include: {
+          roomType: true,
+          guest: true
+        }
       });
 
       return {
-        ...booking,
-        nights,
-        baseAmount: booking.subtotal,
-        taxAmount: booking.tax,
-        totalAmount: booking.total
+        booking,
+        pricing
       };
+    });
+  }
+
+  /**
+   * Retrieves booking by code and verifies phone match.
+   */
+  static async getBookingByCodeAndPhone(code: string, phone: string) {
+    const booking = await prisma.booking.findFirst({
+      where: {
+        code,
+        guest: { phone }
+      },
+      include: {
+        roomType: true,
+        guest: true,
+        payments: true
+      }
+    });
+
+    if (!booking) {
+      throw new HttpError(404, "Booking not found or phone number does not match");
+    }
+
+    return booking;
+  }
+
+  /**
+   * Cancels booking enforcing 24-hour rule before check-in.
+   */
+  static async cancelBooking(code: string, phone?: string) {
+    const booking = await prisma.booking.findUnique({
+      where: { code },
+      include: { guest: true }
+    });
+
+    if (!booking) {
+      throw new HttpError(404, "Booking not found");
+    }
+
+    if (phone && booking.guest.phone !== phone) {
+      throw new HttpError(403, "Unauthorized to cancel this booking");
+    }
+
+    if (booking.status === "CANCELLED") {
+      throw new HttpError(400, "Booking is already cancelled");
+    }
+
+    // 24-hour cancellation rule
+    const now = new Date();
+    const checkInTime = new Date(booking.checkIn);
+    const diffHours = (checkInTime.getTime() - now.getTime()) / (1000 * 60 * 60);
+
+    if (diffHours < 24) {
+      throw new HttpError(400, "Cancellation must be made at least 24 hours prior to check-in");
+    }
+
+    return await prisma.booking.update({
+      where: { id: booking.id },
+      data: { status: "CANCELLED" }
+    });
+  }
+
+  /**
+   * Expires overdue holds
+   */
+  static async expireOverdueHolds() {
+    const now = new Date();
+    return await prisma.booking.updateMany({
+      where: {
+        status: { in: ["PENDING", "HOLD"] },
+        expiresAt: { lte: now }
+      },
+      data: { status: "EXPIRED" }
     });
   }
 }
