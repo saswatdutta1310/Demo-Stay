@@ -8,7 +8,7 @@ import {
   BookingStatus,
   PaymentStatus
 } from "@hotel-demo/shared";
-import { getClientConfig } from "./client-config";
+import { getClientRooms } from "./client-rooms";
 
 export interface CreateBookingPayload {
   roomId: string;
@@ -59,8 +59,7 @@ const delay = (ms = 400) => new Promise((resolve) => setTimeout(resolve, ms));
 export async function getRooms(): Promise<Room[]> {
   if (USE_MOCK) {
     await delay(400);
-    const { rooms } = getClientConfig();
-    return rooms;
+    return getClientRooms();
   }
 
   const res = await fetch(`${API_BASE}/rooms`, { cache: "no-store" });
@@ -79,7 +78,7 @@ export async function getAvailability(
 ): Promise<Room[]> {
   if (USE_MOCK) {
     await delay(400);
-    const { rooms } = getClientConfig();
+    const rooms = getClientRooms();
     const checkIn = new Date(from);
     const checkOut = new Date(to);
 
@@ -114,7 +113,7 @@ export async function getAvailability(
 export async function createBooking(payload: CreateBookingPayload): Promise<Booking> {
   if (USE_MOCK) {
     await delay(400);
-    const { rooms } = getClientConfig();
+    const rooms = getClientRooms();
     const room = rooms.find((r) => r.id === payload.roomId || r.slug === payload.roomId);
     if (!room) throw new Error("Selected room not found");
 
