@@ -10,8 +10,13 @@ const config: Config = {
     extend: {
       colors: {
         primary: "var(--color-primary, #b45309)",
-        secondary: "var(--color-secondary, #78350f)",
-        accent: "var(--color-accent, #fef3c7)"
+        accent: "var(--color-accent, #b45309)",
+        background: "var(--color-bg, #ffffff)",
+        ink: "var(--color-ink, #1c1917)"
+      },
+      fontFamily: {
+        heading: ["var(--font-heading)", "system-ui", "-apple-system", "sans-serif"],
+        body: ["var(--font-body)", "system-ui", "-apple-system", "sans-serif"]
       }
     }
   },
