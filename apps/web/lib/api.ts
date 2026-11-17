@@ -40,13 +40,97 @@ const API_BASE =
   "http://localhost:5000/api/v1";
 
 // In-memory store for mock mode
+const now = new Date();
+const todayIso = now.toISOString().split("T")[0];
+const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+const tomorrowIso = tomorrow.toISOString().split("T")[0];
+const dayAfter = new Date(now.getTime() + 48 * 60 * 60 * 1000);
+const dayAfterIso = dayAfter.toISOString().split("T")[0];
+
+const initialMockBookings: Booking[] = [
+  {
+    id: "mock_seed_1",
+    code: "DS-9281",
+    roomId: "king-size-bed-room",
+    guestName: "Aarav Sharma",
+    guestEmail: "aarav.sharma@example.com",
+    guestPhone: "+91 98765 43210",
+    checkIn: todayIso,
+    checkOut: tomorrowIso,
+    nights: 1,
+    guestsCount: 2,
+    baseAmount: 2614,
+    taxAmount: 420,
+    totalAmount: 3034,
+    status: BookingStatus.CONFIRMED,
+    createdAt: new Date(now.getTime() - 25 * 60 * 1000).toISOString()
+  },
+  {
+    id: "mock_seed_2",
+    code: "DS-8192",
+    roomId: "double-king-size-bed-room",
+    guestName: "Pooja Mishra",
+    guestEmail: "pooja.m@example.com",
+    guestPhone: "+91 98111 22233",
+    checkIn: todayIso,
+    checkOut: dayAfterIso,
+    nights: 2,
+    guestsCount: 3,
+    baseAmount: 6100,
+    taxAmount: 980,
+    totalAmount: 7080,
+    status: BookingStatus.CONFIRMED,
+    createdAt: new Date(now.getTime() - 65 * 60 * 1000).toISOString()
+  },
+  {
+    id: "mock_seed_3",
+    code: "DS-7712",
+    roomId: "non-ac-room",
+    guestName: "Rohan Patel",
+    guestEmail: "rohan.p@example.com",
+    guestPhone: "+91 97222 33445",
+    checkIn: tomorrowIso,
+    checkOut: dayAfterIso,
+    nights: 1,
+    guestsCount: 1,
+    baseAmount: 2150,
+    taxAmount: 350,
+    totalAmount: 2500,
+    status: BookingStatus.PENDING,
+    createdAt: new Date(now.getTime() - 110 * 60 * 1000).toISOString()
+  }
+];
+
+const initialMockPayments: Payment[] = [
+  {
+    id: "pay_seed_1",
+    bookingId: "mock_seed_1",
+    amount: 3034,
+    currency: "INR",
+    status: PaymentStatus.PAID,
+    razorpayOrderId: "order_seed_1",
+    razorpayPaymentId: "pay_rzp_live_9281",
+    createdAt: new Date(now.getTime() - 24 * 60 * 1000).toISOString()
+  },
+  {
+    id: "pay_seed_2",
+    bookingId: "mock_seed_2",
+    amount: 7080,
+    currency: "INR",
+    status: PaymentStatus.PAID,
+    razorpayOrderId: "order_seed_2",
+    razorpayPaymentId: "pay_rzp_live_8192",
+    createdAt: new Date(now.getTime() - 64 * 60 * 1000).toISOString()
+  }
+];
+
 const mockStore: {
   bookings: Booking[];
   payments: Payment[];
   feedbacks: FeedbackSubmission[];
 } = {
-  bookings: [],
-  payments: [],
+  bookings: [...initialMockBookings],
+  payments: [...initialMockPayments],
   feedbacks: []
 };
 
@@ -255,13 +339,25 @@ export async function confirmPayment(bookingId: string): Promise<Booking> {
   return data.data;
 }
 
+export type OwnerBookingRecord = Booking & {
+  paymentId?: string;
+  paymentStatus?: string;
+};
+
 /**
  * 7. getOwnerBookings()
  */
-export async function getOwnerBookings(): Promise<Booking[]> {
+export async function getOwnerBookings(): Promise<OwnerBookingRecord[]> {
   if (USE_MOCK) {
     await delay(400);
-    return [...mockStore.bookings];
+    return mockStore.bookings.map((booking) => {
+      const payment = mockStore.payments.find((p) => p.bookingId === booking.id);
+      return {
+        ...booking,
+        paymentId: payment?.razorpayPaymentId || payment?.id,
+        paymentStatus: payment?.status
+      };
+    });
   }
 
   const res = await fetch(`${API_BASE}/owner/bookings`, { cache: "no-store" });
