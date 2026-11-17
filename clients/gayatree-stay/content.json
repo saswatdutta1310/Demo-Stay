@@ -1,48 +1,63 @@
 {
-  "about": "Gayatree Nivas is a peaceful family-run guest house situated in Puri, Odisha. Designed for devotees visiting Lord Jagannath Temple and families desiring a tranquil coastal retreat with clean accommodations and personalized care.",
+  "about": "Gayatree Stay is a welcoming property situated in Old Town, Bhubaneswar, just an 8 minutes' walk from the iconic Lingaraj Temple. Perfectly suited for pilgrims, families, and leisure travelers seeking serene accommodations with modern hospitality in the temple city.",
   "faqs": [
     {
-      "question": "How far is Gayatree Nivas from Jagannath Temple?",
-      "answer": "We are located approximately 1 km away, an easy 12-minute walk or a 5-minute e-rickshaw ride."
+      "question": "How far is Gayatree Stay from Lingaraj Temple?",
+      "answer": "We are situated just an 8 minutes' walk from Lingaraj Temple in Old Town Bhubaneswar."
     },
     {
-      "question": "Is car parking available?",
-      "answer": "Yes, we offer secure private parking for guest vehicles on-site."
+      "question": "What IDs are accepted at check-in?",
+      "answer": "Passport, Aadhaar, Driving License, or Government ID are accepted. Local IDs are not accepted."
     },
     {
-      "question": "Is hot water available 24/7?",
-      "answer": "Yes, all attached bathrooms are equipped with electric geysers."
+      "question": "What are the check-in and check-out timings?",
+      "answer": "Check-in is from 10:30 AM and check-out is by 11:00 AM."
     }
   ],
   "nearbyPlaces": [
     {
-      "name": "Shree Jagannath Temple",
-      "distance": "1.0 km (12 mins walk)",
+      "name": "Lingaraj Temple",
+      "distance": "8 min walk",
       "type": "Spiritual"
     },
     {
-      "name": "Golden Beach & Promenade",
-      "distance": "1.8 km (7 mins drive)",
-      "type": "Attraction"
+      "name": "Bapuji Nagar",
+      "distance": "3.9 km",
+      "type": "Commercial"
     },
     {
-      "name": "Puri Railway Station",
-      "distance": "2.2 km (8 mins drive)",
+      "name": "KIIT Square",
+      "distance": "15.7 km",
+      "type": "Hub"
+    },
+    {
+      "name": "Bhubaneswar Railway Station",
+      "distance": "TODO",
+      "type": "Transit"
+    },
+    {
+      "name": "Biju Patnaik International Airport",
+      "distance": "TODO",
+      "type": "Transit"
+    },
+    {
+      "name": "Baramunda Bus Stand",
+      "distance": "TODO",
       "type": "Transit"
     }
   ],
   "testimonials": [
     {
-      "guest": "Aarav Sharma",
-      "city": "Bhubaneswar",
+      "guest": "Siddharth Patnaik",
+      "city": "Cuttack",
       "rating": 5,
-      "comment": "The atmosphere is very peaceful and pure. The rooms are spotless and close to the temple."
+      "comment": "Incredible location for visiting Lingaraj Temple. Walking distance and very clean rooms."
     },
     {
-      "guest": "Suman & Rajesh Mohanty",
-      "city": "Rourkela",
+      "guest": "Ananya Roy",
+      "city": "Kolkata",
       "rating": 5,
-      "comment": "Booking directly through their website was smooth and got us the best rates."
+      "comment": "Quiet, comfortable stay in Old Town Bhubaneswar. Perfect family hospitality."
     }
   ]
 }

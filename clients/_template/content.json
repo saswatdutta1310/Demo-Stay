@@ -1,33 +1,24 @@
 {
-  "about": "Welcome to our premier guest house offering genuine hospitality, peaceful atmosphere, and personalized service.",
+  "about": "Welcome to our guest stay, providing comfortable accommodations and serene hospitality.",
   "faqs": [
     {
-      "question": "What is the check-in and check-out schedule?",
-      "answer": "Check-in begins at 12:00 PM and check-out is by 11:00 AM."
-    },
-    {
-      "question": "Is early check-in allowed?",
-      "answer": "Early check-in is subject to room availability upon arrival."
+      "question": "What are the check-in and check-out timings?",
+      "answer": "Check-in starts at 10:30 AM and check-out is at 11:00 AM."
     }
   ],
   "nearbyPlaces": [
     {
-      "name": "Central Railway Station",
-      "distance": "2.5 km (10 mins drive)",
-      "type": "Transit"
-    },
-    {
-      "name": "City Landmark & Market",
-      "distance": "1.2 km (5 mins drive)",
+      "name": "City Landmark",
+      "distance": "10 min walk",
       "type": "Attraction"
     }
   ],
   "testimonials": [
     {
-      "guest": "Siddharth Verma",
-      "city": "Kolkata",
+      "guest": "Satisfied Traveler",
+      "city": "Sample City",
       "rating": 5,
-      "comment": "Exceptional stay. Rooms were spotless and staff was very polite and helpful."
+      "comment": "Wonderful experience, clean room and attentive hospitality."
     }
   ]
 }

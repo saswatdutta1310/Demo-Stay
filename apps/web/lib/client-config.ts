@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { ZodError } from "zod";
 import {
   ClientConfigSchema,
   RoomsConfigSchema,
@@ -11,77 +12,85 @@ import {
   ContentConfig
 } from "@hotel-demo/shared";
 
-export function getClientConfig(): {
+function formatZodError(file: string, error: ZodError): string {
+  const issues = error.issues
+    .map((issue) => `field '${issue.path.join(".") || "root"}': ${issue.message}`)
+    .join(", ");
+  return `Invalid client configuration in ${file} - ${issues}`;
+}
+
+function loadJsonFile(filePath: string, fileName: string): unknown {
+  if (!fs.existsSync(filePath)) {
+    throw new Error(`Missing required client file: ${fileName} at ${filePath}`);
+  }
+  try {
+    const raw = fs.readFileSync(filePath, "utf-8");
+    return JSON.parse(raw);
+  } catch (err) {
+    if (err instanceof SyntaxError) {
+      throw new Error(`Invalid JSON syntax in ${fileName}: ${err.message}`);
+    }
+    throw err;
+  }
+}
+
+export function getClientConfig(explicitSlug?: string): {
   config: ClientConfig;
   rooms: Room[];
   policies: PoliciesConfig;
   content: ContentConfig;
 } {
-  const clientSlug = process.env.CLIENT || "gayatree-stay";
-  const clientDir = path.resolve(process.cwd(), `../../clients/${clientSlug}`);
+  const clientSlug = explicitSlug || process.env.CLIENT || "gayatree-stay";
 
-  try {
-    const config = ClientConfigSchema.parse(
-      JSON.parse(fs.readFileSync(path.join(clientDir, "config.json"), "utf-8"))
-    );
-    const rooms = RoomsConfigSchema.parse(
-      JSON.parse(fs.readFileSync(path.join(clientDir, "rooms.json"), "utf-8"))
-    );
-    const policies = PoliciesConfigSchema.parse(
-      JSON.parse(fs.readFileSync(path.join(clientDir, "policies.json"), "utf-8"))
-    );
-    const content = ContentConfigSchema.parse(
-      JSON.parse(fs.readFileSync(path.join(clientDir, "content.json"), "utf-8"))
-    );
+  // Check candidates for the clients directory (running in Next.js or scripts)
+  const candidateDirs = [
+    path.resolve(process.cwd(), "clients", clientSlug),
+    path.resolve(process.cwd(), "../../clients", clientSlug),
+    path.resolve(__dirname, "../../../../clients", clientSlug),
+    path.resolve(__dirname, "../../clients", clientSlug)
+  ];
 
-    return { config, rooms, policies, content };
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (_err) {
-    // Fallback for building or when client is not found
-    return {
-      config: ClientConfigSchema.parse({
-        slug: "demo-stay",
-        name: "Demo Stay",
-        tagline: "Comfortable Accommodations",
-        theme: {
-          primary: "#b45309",
-          accent: "#fef3c7",
-          background: "#ffffff",
-          ink: "#1c1917",
-          fontHeading: "Cinzel, serif",
-          fontBody: "Inter, sans-serif"
-        },
-        contact: {
-          phone: "+91 98765 43210",
-          whatsapp: "+919876543210",
-          email: "bookings@demostay.com",
-          address: "Demo Road, Odisha"
-        },
-        location: { lat: 19.8135, lng: 85.8312, address: "Demo Road, Odisha" },
-        map: { lat: 19.8135, lng: 85.8312, zoom: 15, address: "Demo Road, Odisha" },
-        payments: { mode: "test", payAtHotel: true },
-        features: {
-          enableReviews: true,
-          enableGallery: true,
-          enableOwnerPortal: true,
-          enableFaq: true
-        }
-      }),
-      rooms: [],
-      policies: {
-        checkInTime: "12:00 PM",
-        checkOutTime: "11:00 AM",
-        cancellation: "48h free cancellation",
-        idRules: ["Govt Photo ID required"],
-        coupleRules: "Couples welcome",
-        childRules: "Children under 6 stay free"
-      },
-      content: {
-        about: "Welcome to our guest house.",
-        faqs: [],
-        nearbyPlaces: [],
-        testimonials: []
-      }
-    };
+  let clientDir = candidateDirs.find((dir) => fs.existsSync(dir));
+  if (!clientDir) {
+    clientDir = candidateDirs[0];
   }
+
+  const configFile = path.join(clientDir, "config.json");
+  const roomsFile = path.join(clientDir, "rooms.json");
+  const policiesFile = path.join(clientDir, "policies.json");
+  const contentFile = path.join(clientDir, "content.json");
+
+  // 1. Config
+  const rawConfig = loadJsonFile(configFile, "config.json");
+  const parsedConfig = ClientConfigSchema.safeParse(rawConfig);
+  if (!parsedConfig.success) {
+    throw new Error(formatZodError("config.json", parsedConfig.error));
+  }
+  const config = parsedConfig.data;
+
+  // 2. Rooms
+  const rawRooms = loadJsonFile(roomsFile, "rooms.json");
+  const parsedRooms = RoomsConfigSchema.safeParse(rawRooms);
+  if (!parsedRooms.success) {
+    throw new Error(formatZodError("rooms.json", parsedRooms.error));
+  }
+  const rooms = parsedRooms.data;
+
+  // 3. Policies
+  const rawPolicies = loadJsonFile(policiesFile, "policies.json");
+  const parsedPolicies = PoliciesConfigSchema.safeParse(rawPolicies);
+  if (!parsedPolicies.success) {
+    throw new Error(formatZodError("policies.json", parsedPolicies.error));
+  }
+  const policies = parsedPolicies.data;
+
+  // 4. Content
+  const rawContent = loadJsonFile(contentFile, "content.json");
+  const parsedContent = ContentConfigSchema.safeParse(rawContent);
+  if (!parsedContent.success) {
+    throw new Error(formatZodError("content.json", parsedContent.error));
+  }
+  const content = parsedContent.data;
+
+  return { config, rooms, policies, content };
 }

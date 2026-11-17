@@ -1,20 +1,31 @@
 {
-  "name": "Hotel Demo Template",
-  "tagline": "Comfortable Stay & Authentic Hospitality",
-  "theme": "modern",
-  "primaryColor": "#0f766e",
+  "slug": "_template",
+  "name": "Template Stay",
+  "tagline": "Comfortable & Peaceful Accommodations",
+  "theme": {
+    "primary": "#b45309",
+    "accent": "#fef3c7",
+    "background": "#ffffff",
+    "ink": "#1c1917",
+    "fontHeading": "Cinzel, serif",
+    "fontBody": "Inter, sans-serif"
+  },
   "contact": {
-    "phone": "+91 98000 00000",
-    "whatsapp": "+919800000000",
-    "email": "contact@hoteldemo.com",
-    "address": "123 Heritage Road, Demo City, India"
+    "phone": "+91 98765 43210",
+    "whatsapp": "+919876543210",
+    "email": "bookings@example.com",
+    "address": "123 Temple Road, City, State 750001"
   },
-  "map": {
-    "lat": 19.8135,
-    "lng": 85.8312,
-    "zoom": 15
+  "location": {
+    "lat": 20.2444,
+    "lng": 85.8358,
+    "address": "123 Temple Road, City, State 750001"
   },
-  "featureFlags": {
+  "payments": {
+    "mode": "test",
+    "payAtHotel": true
+  },
+  "features": {
     "enableReviews": true,
     "enableGallery": true,
     "enableOwnerPortal": true,

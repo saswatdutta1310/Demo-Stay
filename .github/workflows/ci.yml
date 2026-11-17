@@ -3,49 +3,47 @@ name: CI Pipeline
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
 jobs:
-  validate-and-build:
+  ci:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [18.x, 20.x]
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js ${{ matrix.node-version }}
+      - name: Setup Node.js 20.x
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 20.x
+          cache: "npm"
 
       - name: Install dependencies
-        run: |
-          if [ -f package-lock.json ]; then
-            npm ci
-          else
-            npm install
-          fi
+        run: npm ci
 
       - name: Generate Prisma Client
         run: npm run prisma:generate --workspace=@hotel-demo/api --if-present
 
       - name: Lint
-        run: npm run lint --if-present
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
 
       - name: Test
-        run: npm run test --if-present
+        run: npm run test
 
       - name: Validate client configurations
-        run: npm run client:validate --if-present
+        run: npm run client:validate
 
-      - name: Build monorepo packages & apps
-        run: npm run build --if-present
+      - name: Build
+        run: npm run build
         env:
           CLIENT: gayatree-stay
-          DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/demodb"
-          RAZORPAY_KEY_ID: "rzp_test_dummy"
-          RAZORPAY_KEY_SECRET: "dummy_secret"
+          DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/hotel_demo_db?schema=public"
+          RAZORPAY_KEY_ID: "rzp_test_YourTestKeyIdHere"
+          RAZORPAY_KEY_SECRET: "YourRazorpaySecretKeyHere"
+          JWT_SECRET: "your_jwt_secret_change_in_production"
+          OWNER_PIN: "1234"
+          API_URL: "http://localhost:5000/api/v1"
+          WEB_URL: "http://localhost:3000"

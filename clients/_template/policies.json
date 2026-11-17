@@ -1,11 +1,23 @@
 {
-  "checkInTime": "12:00 PM",
+  "checkInTime": "10:30 AM",
   "checkOutTime": "11:00 AM",
-  "cancellation": "Free cancellation up to 48 hours before check-in. Cancellations within 48 hours are non-refundable.",
+  "cancellation": "Free cancellation until 24 hours before check-in",
+  "primaryGuestAge": "18+",
+  "groupRules": "No male-only groups allowed",
+  "petRules": "No pets allowed",
+  "smokingRules": "No smoking inside premises",
+  "coupleRules": "Unmarried couples allowed with valid individual photo IDs",
+  "localIdRules": "Local IDs not accepted",
   "idRules": [
-    "Government approved photo ID is mandatory for all adult guests (Aadhaar, Passport, Driving License, Voter ID).",
-    "PAN cards are not accepted as valid identity proof."
+    "Valid government-issued photo ID required for every adult guest (Passport, Aadhaar, Driving License, or Govt ID).",
+    "Local IDs not accepted.",
+    "Primary guest must be at least 18 years of age."
   ],
-  "coupleRules": "Couples welcome with valid individual photo identification.",
-  "childRules": "Children up to 5 years stay free using existing bedding."
+  "acceptedIdTypes": [
+    "Passport",
+    "Aadhaar",
+    "Driving License",
+    "Govt ID"
+  ],
+  "childRules": "Children stay free with existing bedding."
 }

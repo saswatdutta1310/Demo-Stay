@@ -1,16 +1,26 @@
 [
   {
     "id": "deluxe-room",
-    "name": "Deluxe Room",
     "slug": "deluxe-room",
-    "price": 2000,
-    "capacity": 2,
-    "unitsAvailable": 5,
-    "description": "Bright and airy room with modern amenities, comfortable double bed, and attached bathroom.",
-    "amenities": ["Air Conditioning", "Free Wi-Fi", "Geyser", "Smart TV", "Daily Housekeeping"],
+    "name": "Deluxe Room",
+    "sizeSqFt": 150,
+    "bed": "1 King Bed",
+    "maxGuests": 3,
+    "amenities": [
+      "1 King Bed",
+      "1 Bathroom",
+      "Safe",
+      "Hot and cold water",
+      "Toiletries",
+      "Towels",
+      "TV"
+    ],
+    "basePrice": 2200,
+    "taxPerNight": 264,
+    "units": 3,
     "images": [
       "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1000&q=80"
     ],
-    "bedType": "Queen Bed"
+    "description": "Standard comfortable room with attached bathroom, clean linens, and modern amenities."
   }
 ]
