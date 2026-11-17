@@ -16,7 +16,7 @@
     "build:api": "npm run prisma:generate && npm run build --workspace=@hotel-demo/api",
     "build": "npm run build:shared && npm run build:api && npm run build:web",
     "prisma:generate": "npm run prisma:generate --workspace=@hotel-demo/api",
-    "typecheck": "npm run typecheck --workspaces --if-present",
+    "typecheck": "npm run build:shared && npm run typecheck --workspaces --if-present",
     "test:shared": "npm run test --workspace=@hotel-demo/shared",
     "test:api": "npm run test --workspace=@hotel-demo/api",
     "test": "npm run test:shared && npm run test:api",

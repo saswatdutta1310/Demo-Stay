@@ -25,9 +25,10 @@ jobs:
             npm install
           fi
 
-      - name: Generate Prisma Client
+      - name: Generate Prisma Client & Build Shared
         run: |
           npm run prisma:generate --if-present
+          npm run build:shared
 
       - name: Lint
         run: npm run lint
