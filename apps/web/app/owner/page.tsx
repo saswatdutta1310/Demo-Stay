@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { DollarSign, Calendar, TrendingUp, Bell } from "lucide-react";
+import { DollarSign, TrendingUp, Bell } from "lucide-react";
 
 export default function OwnerDashboard() {
   const dummyFeed = [

@@ -35,28 +35,38 @@ export function getClientConfig(): {
     );
 
     return { config, rooms, policies, content };
-  } catch (err) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (_err) {
     // Fallback for building or when client is not found
     return {
-      config: {
+      config: ClientConfigSchema.parse({
+        slug: "demo-stay",
         name: "Demo Stay",
         tagline: "Comfortable Accommodations",
-        theme: "modern",
-        primaryColor: "#b45309",
+        theme: {
+          primary: "#b45309",
+          accent: "#fef3c7",
+          background: "#ffffff",
+          ink: "#1c1917",
+          fontHeading: "Cinzel, serif",
+          fontBody: "Inter, sans-serif"
+        },
         contact: {
           phone: "+91 98765 43210",
           whatsapp: "+919876543210",
           email: "bookings@demostay.com",
           address: "Demo Road, Odisha"
         },
-        map: { lat: 19.8135, lng: 85.8312, zoom: 15 },
-        featureFlags: {
+        location: { lat: 19.8135, lng: 85.8312, address: "Demo Road, Odisha" },
+        map: { lat: 19.8135, lng: 85.8312, zoom: 15, address: "Demo Road, Odisha" },
+        payments: { mode: "test", payAtHotel: true },
+        features: {
           enableReviews: true,
           enableGallery: true,
           enableOwnerPortal: true,
           enableFaq: true
         }
-      },
+      }),
       rooms: [],
       policies: {
         checkInTime: "12:00 PM",

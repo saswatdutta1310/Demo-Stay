@@ -28,7 +28,8 @@ app.use("/api/v1/owner", ownerRoutes);
 app.use("/api/v1/feedback", feedbackRoutes);
 app.use("/api/v1/demo", demoRoutes);
 
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+app.use((err: Error & { status?: number }, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   res.status(err.status || 500).json({
     success: false,
     message: err.message || "Internal server error"

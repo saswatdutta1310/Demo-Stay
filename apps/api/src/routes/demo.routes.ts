@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { prisma } from "../utils/db";
-import { BookingStatus, PaymentStatus } from "@hotel-demo/shared";
+import { BookingStatus } from "@hotel-demo/shared";
 import { env } from "../config/env";
 
 const router = Router();

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ShieldCheck, Info } from "lucide-react";
+import { Info } from "lucide-react";
 
 export default function BookPage() {
   const router = useRouter();

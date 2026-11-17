@@ -18,7 +18,7 @@ export class AvailabilityService {
             OR: [
               { status: BookingStatus.CONFIRMED },
               {
-                status: BookingStatus.HOLD,
+                status: BookingStatus.PENDING,
                 holdExpiresAt: { gt: now }
               }
             ]

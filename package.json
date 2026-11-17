@@ -10,13 +10,16 @@
   "scripts": {
     "dev:web": "npm run dev --workspace=@hotel-demo/web",
     "dev:api": "npm run dev --workspace=@hotel-demo/api",
+    "dev": "npm run dev:web",
     "build:shared": "npm run build --workspace=@hotel-demo/shared",
     "build:web": "npm run build --workspace=@hotel-demo/web",
     "build:api": "npm run build --workspace=@hotel-demo/api",
     "build": "npm run build:shared && npm run build:api && npm run build:web",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test:shared": "npm run test --workspace=@hotel-demo/shared",
     "test:api": "npm run test --workspace=@hotel-demo/api",
-    "test": "npm run test:api",
-    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test:shared && npm run test:api",
+    "lint": "eslint .",
     "client:new": "ts-node scripts/new-client.ts",
     "client:validate": "ts-node scripts/validate-client.ts",
     "demo:seed": "ts-node scripts/seed-demo.ts",
@@ -24,6 +27,11 @@
     "demo:deploy": "ts-node scripts/deploy-demo.ts"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.72.2",
+    "@typescript-eslint/parser": "^8.72.2",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.10.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
   }

@@ -1,24 +1,36 @@
+export const BOOKING_STATUSES = ["PENDING", "CONFIRMED", "CANCELLED", "EXPIRED"] as const;
+export type BookingStatusType = (typeof BOOKING_STATUSES)[number];
+
 export enum BookingStatus {
-  HOLD = "HOLD",
+  PENDING = "PENDING",
   CONFIRMED = "CONFIRMED",
-  CHECKED_IN = "CHECKED_IN",
-  CHECKED_OUT = "CHECKED_OUT",
   CANCELLED = "CANCELLED",
   EXPIRED = "EXPIRED"
 }
 
+export const PAYMENT_STATUSES = ["CREATED", "PAID", "FAILED", "REFUNDED"] as const;
+export type PaymentStatusType = (typeof PAYMENT_STATUSES)[number];
+
 export enum PaymentStatus {
-  PENDING = "PENDING",
-  SUCCESS = "SUCCESS",
+  CREATED = "CREATED",
+  PAID = "PAID",
   FAILED = "FAILED",
   REFUNDED = "REFUNDED"
 }
 
+export const ACCEPTED_ID_TYPES = [
+  "Passport",
+  "Aadhaar",
+  "Driving License",
+  "Govt ID"
+] as const;
+export type AcceptedIDType = (typeof ACCEPTED_ID_TYPES)[number];
+
 export enum IDType {
-  AADHAAR = "AADHAAR",
-  PASSPORT = "PASSPORT",
-  VOTER_ID = "VOTER_ID",
-  DRIVING_LICENSE = "DRIVING_LICENSE"
+  PASSPORT = "Passport",
+  AADHAAR = "Aadhaar",
+  DRIVING_LICENSE = "Driving License",
+  GOVT_ID = "Govt ID"
 }
 
 export const DEFAULT_HOLD_DURATION_MINUTES = 15;

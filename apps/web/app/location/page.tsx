@@ -1,5 +1,5 @@
 import { getClientConfig } from "@/lib/client-config";
-import { MapPin, Navigation } from "lucide-react";
+import { MapPin } from "lucide-react";
 
 export default function LocationPage() {
   const { config, content } = getClientConfig();

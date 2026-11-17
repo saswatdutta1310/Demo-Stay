@@ -8,6 +8,7 @@ generator client {
 }
 
 enum BookingStatus {
+  PENDING
   HOLD
   CONFIRMED
   CHECKED_IN
@@ -17,7 +18,9 @@ enum BookingStatus {
 }
 
 enum PaymentStatus {
+  CREATED
   PENDING
+  PAID
   SUCCESS
   FAILED
   REFUNDED

@@ -22,7 +22,7 @@ export class PaymentService {
         bookingId: booking.id,
         amount: booking.totalAmount,
         currency: "INR",
-        status: PaymentStatus.PENDING,
+        status: PaymentStatus.CREATED,
         razorpayOrderId: order.id
       }
     });
@@ -51,7 +51,7 @@ export class PaymentService {
       data: {
         razorpayPaymentId: data.razorpayPaymentId,
         razorpaySignature: data.razorpaySignature,
-        status: PaymentStatus.SUCCESS
+        status: PaymentStatus.PAID
       }
     });
 

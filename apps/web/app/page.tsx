@@ -1,6 +1,6 @@
 import { getClientConfig } from "@/lib/client-config";
 import Link from "next/link";
-import { BedDouble, Sparkles, MapPin, ShieldCheck, HeartHandshake } from "lucide-react";
+import { Sparkles, ShieldCheck, HeartHandshake } from "lucide-react";
 
 export default function HomePage() {
   const { config, rooms, content } = getClientConfig();

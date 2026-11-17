@@ -34,8 +34,9 @@ for (const client of clients) {
     ContentConfigSchema.parse(content);
 
     console.log(`   ✅ Valid schema`);
-  } catch (err: any) {
-    console.error(`   ❌ Validation failed for [${client}]:`, err.errors || err.message);
+  } catch (err: unknown) {
+    const errorDetails = err instanceof Error ? err.message : String(err);
+    console.error(`   ❌ Validation failed for [${client}]:`, errorDetails);
     hasErrors = true;
   }
 }

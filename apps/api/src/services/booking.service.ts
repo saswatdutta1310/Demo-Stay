@@ -54,7 +54,7 @@ export class BookingService {
           baseAmount,
           taxAmount,
           totalAmount,
-          status: BookingStatus.HOLD,
+          status: BookingStatus.PENDING,
           holdExpiresAt,
           specialRequests: data.specialRequests
         },
