@@ -1,7 +1,15 @@
 import dotenv from "dotenv";
+import path from "path";
 import { z } from "zod";
 
 dotenv.config();
+dotenv.config({ path: path.resolve(__dirname, "../../.env") });
+dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
+
+if (!process.env.DATABASE_URL) {
+  const defaultDbPath = path.resolve(__dirname, "../../prisma/dev.db").replace(/\\/g, "/");
+  process.env.DATABASE_URL = `file:${defaultDbPath}`;
+}
 
 const EnvSchema = z.object({
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
@@ -13,6 +21,7 @@ const EnvSchema = z.object({
   RAZORPAY_KEY_SECRET: z.string().default("secret_sample"),
   RAZORPAY_WEBHOOK_SECRET: z.string().optional(),
   OWNER_PIN: z.string().default("1234"),
+  JWT_SECRET: z.string().default("super-secret-owner-jwt-key"),
   HOLD_EXPIRY_MINUTES: z.coerce.number().default(15)
 });
 

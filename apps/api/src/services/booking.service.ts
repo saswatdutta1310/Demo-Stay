@@ -3,6 +3,7 @@ import { prisma } from "../utils/db";
 import { PricingService } from "./pricing.service";
 import { AvailabilityService } from "./availability.service";
 import { loadClientData } from "../config/client";
+import { SSEStreamService } from "./sse.service";
 
 export interface CreateBookingInput {
   roomTypeId: string;
@@ -80,7 +81,7 @@ export class BookingService {
     }
 
     // Execute in ONE transaction
-    return await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
       // 1. Fetch RoomType
       const roomType = await tx.roomType.findFirst({
         where: {
@@ -143,7 +144,7 @@ export class BookingService {
       // 6. 10-minute hold
       const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
-      const booking = await tx.booking.create({
+      const createdBooking = await tx.booking.create({
         data: {
           code,
           roomTypeId: roomType.id,
@@ -167,10 +168,22 @@ export class BookingService {
       });
 
       return {
-        booking,
+        booking: createdBooking,
         pricing
       };
     });
+
+    // Broadcast new booking to owner SSE stream
+    try {
+      SSEStreamService.broadcast({
+        type: "booking.created",
+        data: result.booking
+      });
+    } catch {
+      // Non-blocking broadcast
+    }
+
+    return result;
   }
 
   /**

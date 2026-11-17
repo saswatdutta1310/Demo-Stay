@@ -4,6 +4,7 @@ import { env } from "../config/env";
 import { prisma } from "../utils/db";
 import { BookingStatus, PaymentStatus } from "@hotel-demo/shared";
 import { EventsService } from "./events.service";
+import { SSEStreamService } from "./sse.service";
 
 export class PaymentService {
   static async createOrder(bookingId: string) {
@@ -68,6 +69,15 @@ export class PaymentService {
       amount: confirmedBooking.total,
       timestamp: new Date().toISOString()
     });
+
+    try {
+      SSEStreamService.broadcast({
+        type: "payment.updated",
+        data: confirmedBooking
+      });
+    } catch {
+      // Non-blocking
+    }
 
     return confirmedBooking;
   }
