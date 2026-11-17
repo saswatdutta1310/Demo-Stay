@@ -10,7 +10,7 @@
   "scripts": {
     "dev:web": "npm run dev --workspace=@hotel-demo/web",
     "dev:api": "npm run dev --workspace=@hotel-demo/api",
-    "dev": "npm run dev:web",
+    "dev": "concurrently -k -p \"[{name}]\" -n \"web,api\" -c \"cyan.bold,magenta.bold\" \"npm run dev:web\" \"npm run dev:api\"",
     "build:shared": "npm run build --workspace=@hotel-demo/shared",
     "build:web": "npm run build --workspace=@hotel-demo/web",
     "build:api": "npm run prisma:generate && npm run build --workspace=@hotel-demo/api",
@@ -33,6 +33,7 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^8.72.2",
     "@typescript-eslint/parser": "^8.72.2",
+    "concurrently": "^10.0.7",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.10.1",

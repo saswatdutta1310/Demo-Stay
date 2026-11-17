@@ -66,14 +66,52 @@ export default function OwnerDashboard() {
     }
   };
 
-  // 3-second live polling
+  // Live SSE stream with fallback to 3-second polling
   useEffect(() => {
     fetchFeed(true);
-    const interval = setInterval(() => {
-      fetchFeed(false);
-    }, 3000);
 
-    return () => clearInterval(interval);
+    let eventSource: EventSource | null = null;
+    let pollInterval: NodeJS.Timeout | null = null;
+
+    const startPollingFallback = () => {
+      if (!pollInterval) {
+        pollInterval = setInterval(() => {
+          fetchFeed(false);
+        }, 3000);
+      }
+    };
+
+    try {
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
+      const token = sessionStorage.getItem("owner_token");
+      const streamUrl = `${apiBase}/owner/stream${token ? `?token=${encodeURIComponent(token)}` : ""}`;
+
+      eventSource = new EventSource(streamUrl);
+
+      eventSource.onmessage = (event) => {
+        try {
+          const parsed = JSON.parse(event.data);
+          if (parsed.type === "booking.created" || parsed.type === "payment.updated") {
+            fetchFeed(false);
+          }
+        } catch {
+          // ignore non-json
+        }
+      };
+
+      eventSource.onerror = () => {
+        // SSE connection failed or not supported by endpoint, fallback to 3s polling
+        eventSource?.close();
+        startPollingFallback();
+      };
+    } catch {
+      startPollingFallback();
+    }
+
+    return () => {
+      if (eventSource) eventSource.close();
+      if (pollInterval) clearInterval(pollInterval);
+    };
   }, []);
 
   // Format date helper

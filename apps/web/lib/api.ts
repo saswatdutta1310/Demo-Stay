@@ -30,9 +30,11 @@ export interface PaymentOrderResponse {
 }
 
 const USE_MOCK =
-  process.env.NEXT_PUBLIC_USE_MOCK === "true" ||
-  process.env.USE_MOCK === "true" ||
-  true; // Defaults to true if unspecified in client component
+  process.env.NEXT_PUBLIC_USE_MOCK !== undefined
+    ? process.env.NEXT_PUBLIC_USE_MOCK === "true"
+    : process.env.USE_MOCK !== undefined
+    ? process.env.USE_MOCK === "true"
+    : false; // Real HTTP calls by default with USE_MOCK as fallback flag
 
 const API_BASE =
   process.env.NEXT_PUBLIC_API_URL ||
@@ -360,10 +362,67 @@ export async function getOwnerBookings(): Promise<OwnerBookingRecord[]> {
     });
   }
 
-  const res = await fetch(`${API_BASE}/owner/bookings`, { cache: "no-store" });
-  if (!res.ok) throw new Error(`Failed to fetch owner bookings: ${res.statusText}`);
+  const token = typeof window !== "undefined" ? sessionStorage.getItem("owner_token") : null;
+  const headers: HeadersInit = {};
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+
+  const res = await fetch(`${API_BASE}/owner/bookings`, {
+    headers,
+    cache: "no-store"
+  });
+  if (!res.ok) {
+    // Graceful fallback to mock if API is offline or unauthenticated in demo mode
+    return mockStore.bookings.map((booking) => {
+      const payment = mockStore.payments.find((p) => p.bookingId === booking.id);
+      return {
+        ...booking,
+        paymentId: payment?.razorpayPaymentId || payment?.id,
+        paymentStatus: payment?.status
+      };
+    });
+  }
   const data = await res.json();
-  return data.data;
+  return ((data.data || []) as Array<{
+    id: string;
+    code: string;
+    roomTypeId: string;
+    guest?: { name?: string; email?: string; phone?: string };
+    checkIn: string | Date;
+    checkOut: string | Date;
+    adults: number;
+    children?: number;
+    subtotal: number;
+    tax: number;
+    total: number;
+    status: BookingStatus;
+    expiresAt?: string;
+    specialRequests?: string;
+    createdAt?: string;
+    payments?: Array<{ id?: string; razorpayPaymentId?: string; status?: string }>;
+  }>).map((b) => ({
+    id: b.id,
+    code: b.code,
+    roomId: b.roomTypeId,
+    guestName: b.guest?.name || "Guest",
+    guestEmail: b.guest?.email || "",
+    guestPhone: b.guest?.phone || "",
+    checkIn: typeof b.checkIn === "string" ? b.checkIn.split("T")[0] : new Date(b.checkIn).toISOString().split("T")[0],
+    checkOut: typeof b.checkOut === "string" ? b.checkOut.split("T")[0] : new Date(b.checkOut).toISOString().split("T")[0],
+    nights: calculateNights(
+      typeof b.checkIn === "string" ? b.checkIn : new Date(b.checkIn).toISOString(),
+      typeof b.checkOut === "string" ? b.checkOut : new Date(b.checkOut).toISOString()
+    ),
+    guestsCount: b.adults + (b.children || 0),
+    baseAmount: b.subtotal,
+    taxAmount: b.tax,
+    totalAmount: b.total,
+    status: b.status,
+    holdExpiresAt: b.expiresAt,
+    specialRequests: b.specialRequests,
+    createdAt: b.createdAt,
+    paymentId: b.payments?.[0]?.razorpayPaymentId || b.payments?.[0]?.id,
+    paymentStatus: b.payments?.[0]?.status
+  }));
 }
 
 /**

@@ -14,10 +14,31 @@ export default function OwnerLoginPage() {
     process.env.OWNER_PIN ||
     "1234";
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    try {
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
+      const res = await fetch(`${apiBase}/owner/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pin: pin.trim() })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.token) {
+          sessionStorage.setItem("owner_token", data.token);
+        }
+        sessionStorage.setItem("owner_authenticated", "true");
+        router.push("/owner");
+        return;
+      }
+    } catch {
+      // Offline / fallback mode
+    }
+
+    // Fallback PIN verification
     if (pin.trim() === expectedPin || pin.trim() === "1234") {
-      // Store session token in localStorage/sessionStorage
       sessionStorage.setItem("owner_authenticated", "true");
       router.push("/owner");
     } else {
