@@ -5,8 +5,8 @@ const router = Router();
 
 router.get("/", async (req, res, next) => {
   try {
-    const rooms = await prisma.room.findMany();
-    res.json({ success: true, data: rooms });
+    const roomTypes = await prisma.roomType.findMany();
+    res.json({ success: true, data: roomTypes });
   } catch (err) {
     next(err);
   }
@@ -14,9 +14,9 @@ router.get("/", async (req, res, next) => {
 
 router.get("/:slug", async (req, res, next) => {
   try {
-    const room = await prisma.room.findUnique({ where: { slug: req.params.slug } });
-    if (!room) return res.status(404).json({ success: false, message: "Room not found" });
-    res.json({ success: true, data: room });
+    const roomType = await prisma.roomType.findUnique({ where: { slug: req.params.slug } });
+    if (!roomType) return res.status(404).json({ success: false, message: "Room not found" });
+    res.json({ success: true, data: roomType });
   } catch (err) {
     next(err);
   }

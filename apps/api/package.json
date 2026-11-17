@@ -9,7 +9,11 @@
     "start": "node dist/server.js",
     "test": "jest --passWithNoTests",
     "prisma:generate": "prisma generate",
-    "prisma:seed": "ts-node prisma/seed.ts"
+    "prisma:seed": "ts-node prisma/seed.ts",
+    "db:migrate": "prisma migrate deploy",
+    "db:migrate:dev": "prisma migrate dev",
+    "db:seed": "ts-node prisma/seed.ts",
+    "db:reset": "prisma migrate reset --force"
   },
   "dependencies": {
     "@hotel-demo/shared": "*",

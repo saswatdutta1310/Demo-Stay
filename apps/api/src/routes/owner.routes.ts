@@ -21,7 +21,7 @@ router.get("/feed", (req, res) => {
 router.get("/bookings", async (req, res, next) => {
   try {
     const bookings = await prisma.booking.findMany({
-      include: { room: true, guest: true, payments: true },
+      include: { roomType: true, guest: true, payments: true },
       orderBy: { createdAt: "desc" }
     });
     res.json({ success: true, data: bookings });

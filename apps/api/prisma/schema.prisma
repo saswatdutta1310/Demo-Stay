@@ -1,5 +1,5 @@
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -7,37 +7,21 @@ generator client {
   provider = "prisma-client-js"
 }
 
-enum BookingStatus {
-  PENDING
-  HOLD
-  CONFIRMED
-  CHECKED_IN
-  CHECKED_OUT
-  CANCELLED
-  EXPIRED
-}
-
-enum PaymentStatus {
-  CREATED
-  PENDING
-  PAID
-  SUCCESS
-  FAILED
-  REFUNDED
-}
-
-model Room {
+model RoomType {
   id              String        @id
-  name            String
   slug            String        @unique
-  price           Float
-  capacity        Int           @default(2)
-  unitsAvailable  Int           @default(1)
-  description     String
-  amenities       String[]
-  images          String[]
-  bedType         String        @default("Double Bed")
+  name            String
+  sizeSqFt        Int?
+  bed             String?
+  maxGuests       Int           @default(2)
+  amenities       String        @default("[]") // JSON serialized array for SQLite & PostgreSQL compatibility
+  basePrice       Float
+  taxPerNight     Float         @default(0)
+  units           Int           @default(1)
+  images          String        @default("[]") // JSON serialized array
+  description     String?
   createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 
   bookings        Booking[]
   blockedDates    BlockedDate[]
@@ -45,83 +29,108 @@ model Room {
 }
 
 model Guest {
-  id          String    @id @default(cuid())
-  name        String
-  email       String
-  phone       String
-  idType      String?
-  idNumber    String?
-  bookings    Booking[]
-  createdAt   DateTime  @default(now())
+  id              String        @id @default(cuid())
+  name            String
+  phone           String
+  email           String
+  idType          String?
+  idLast4         String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  bookings        Booking[]
 }
 
 model Booking {
   id              String        @id @default(cuid())
   code            String        @unique
-  roomId          String
-  room            Room          @relation(fields: [roomId], references: [id])
+  roomTypeId      String
+  roomType        RoomType      @relation(fields: [roomTypeId], references: [id])
   guestId         String
   guest           Guest         @relation(fields: [guestId], references: [id])
   checkIn         DateTime
   checkOut        DateTime
-  nights          Int
-  guestsCount     Int           @default(1)
-  baseAmount      Float
-  taxAmount       Float
-  totalAmount     Float
-  status          BookingStatus @default(HOLD)
-  holdExpiresAt   DateTime?
+  adults          Int           @default(1)
+  children        Int           @default(0)
+  status          String        @default("HOLD") // PENDING, HOLD, CONFIRMED, CANCELLED, EXPIRED
+  subtotal        Float
+  tax             Float
+  total           Float
+  paymentMode     String        @default("ONLINE") // ONLINE, AT_HOTEL
+  expiresAt       DateTime?
   specialRequests String?
-
-  payments        Payment[]
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 
-  @@index([roomId, checkIn, checkOut])
+  payments        Payment[]
+
   @@index([code])
+  @@index([checkIn, checkOut])
+  @@index([roomTypeId, checkIn, checkOut])
 }
 
 model Payment {
   id                String        @id @default(cuid())
   bookingId         String
   booking           Booking       @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-  amount            Float
-  currency          String        @default("INR")
-  status            PaymentStatus @default(PENDING)
   razorpayOrderId   String        @unique
   razorpayPaymentId String?       @unique
-  razorpaySignature String?
+  status            String        @default("CREATED") // CREATED, PENDING, PAID, FAILED, REFUNDED
+  amount            Float
+  currency          String        @default("INR")
+  refundId          String?
+  refundStatus      String?
+  rawEvent          String?       // JSON event string
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
+
+  @@index([razorpayOrderId])
+  @@index([bookingId])
 }
 
 model BlockedDate {
-  id        String   @id @default(cuid())
-  roomId    String
-  room      Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  startDate DateTime
-  endDate   DateTime
-  reason    String?
-  createdAt DateTime @default(now())
+  id              String        @id @default(cuid())
+  roomTypeId      String
+  roomType        RoomType      @relation(fields: [roomTypeId], references: [id], onDelete: Cascade)
+  startDate       DateTime
+  endDate         DateTime
+  reason          String?
+  createdAt       DateTime      @default(now())
+
+  @@index([roomTypeId, startDate, endDate])
 }
 
 model PriceRule {
-  id        String   @id @default(cuid())
-  roomId    String
-  room      Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  startDate DateTime
-  endDate   DateTime
-  price     Float
-  note      String?
-  createdAt DateTime @default(now())
+  id              String        @id @default(cuid())
+  roomTypeId      String
+  roomType        RoomType      @relation(fields: [roomTypeId], references: [id], onDelete: Cascade)
+  startDate       DateTime
+  endDate         DateTime
+  price           Float
+  note            String?
+  createdAt       DateTime      @default(now())
+
+  @@index([roomTypeId, startDate, endDate])
 }
 
 model Feedback {
-  id           String   @id @default(cuid())
-  name         String
-  phoneOrEmail String
-  hotelName    String
-  rating       Int      @default(5)
-  message      String
-  createdAt    DateTime @default(now())
+  id              String        @id @default(cuid())
+  name            String
+  phoneOrEmail    String
+  hotelName       String
+  rating          Int           @default(5)
+  message         String
+  createdAt       DateTime      @default(now())
+}
+
+model AuditLog {
+  id              String        @id @default(cuid())
+  entityType      String        // e.g. "Booking", "Payment", "RoomType"
+  entityId        String
+  action          String        // e.g. "CREATE", "UPDATE", "REFUND", "CANCEL"
+  details         String?       // JSON string
+  performedBy     String?       // e.g. "system", "guest", "owner"
+  createdAt       DateTime      @default(now())
+
+  @@index([entityType, entityId])
 }

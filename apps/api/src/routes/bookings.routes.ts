@@ -21,7 +21,7 @@ router.get("/lookup", async (req, res, next) => {
         code,
         guest: { phone }
       },
-      include: { room: true, guest: true, payments: true }
+      include: { roomType: true, guest: true, payments: true }
     });
 
     if (!booking) return res.status(404).json({ success: false, message: "Booking not found" });

@@ -11,7 +11,7 @@ export class PaymentService {
     if (!booking) throw new Error("Booking not found");
 
     const order = await razorpay.orders.create({
-      amount: Math.round(booking.totalAmount * 100),
+      amount: Math.round(booking.total * 100),
       currency: "INR",
       receipt: booking.code,
       notes: { bookingId: booking.id }
@@ -20,7 +20,7 @@ export class PaymentService {
     await prisma.payment.create({
       data: {
         bookingId: booking.id,
-        amount: booking.totalAmount,
+        amount: booking.total,
         currency: "INR",
         status: PaymentStatus.CREATED,
         razorpayOrderId: order.id
@@ -50,7 +50,7 @@ export class PaymentService {
       where: { razorpayOrderId: data.razorpayOrderId },
       data: {
         razorpayPaymentId: data.razorpayPaymentId,
-        razorpaySignature: data.razorpaySignature,
+        rawEvent: JSON.stringify({ signature: data.razorpaySignature }),
         status: PaymentStatus.PAID
       }
     });
@@ -58,14 +58,14 @@ export class PaymentService {
     const confirmedBooking = await prisma.booking.update({
       where: { id: data.bookingId },
       data: { status: BookingStatus.CONFIRMED },
-      include: { room: true, guest: true }
+      include: { roomType: true, guest: true }
     });
 
     EventsService.pushPaymentEvent({
       bookingCode: confirmedBooking.code,
       guestName: confirmedBooking.guest.name,
-      roomName: confirmedBooking.room.name,
-      amount: confirmedBooking.totalAmount,
+      roomName: confirmedBooking.roomType.name,
+      amount: confirmedBooking.total,
       timestamp: new Date().toISOString()
     });
 

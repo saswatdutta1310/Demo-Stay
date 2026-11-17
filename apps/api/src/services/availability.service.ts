@@ -3,8 +3,8 @@ import { BookingStatus } from "@hotel-demo/shared";
 
 export class AvailabilityService {
   static async checkAvailability(checkIn: Date, checkOut: Date, guests: number) {
-    const rooms = await prisma.room.findMany({
-      where: { capacity: { gte: guests } }
+    const roomTypes = await prisma.roomType.findMany({
+      where: { maxGuests: { gte: guests } }
     });
 
     const now = new Date();
@@ -19,7 +19,7 @@ export class AvailabilityService {
               { status: BookingStatus.CONFIRMED },
               {
                 status: BookingStatus.PENDING,
-                holdExpiresAt: { gt: now }
+                expiresAt: { gt: now }
               }
             ]
           }
@@ -27,15 +27,15 @@ export class AvailabilityService {
       }
     });
 
-    // Count how many units of each room are currently taken
+    // Count how many units of each room type are currently taken
     const roomBookingCounts: Record<string, number> = {};
     for (const b of activeBookings) {
-      roomBookingCounts[b.roomId] = (roomBookingCounts[b.roomId] || 0) + 1;
+      roomBookingCounts[b.roomTypeId] = (roomBookingCounts[b.roomTypeId] || 0) + 1;
     }
 
-    return rooms.filter((r) => {
+    return roomTypes.filter((r) => {
       const booked = roomBookingCounts[r.id] || 0;
-      return r.unitsAvailable > booked;
+      return r.units > booked;
     });
   }
 }

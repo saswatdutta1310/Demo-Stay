@@ -10,7 +10,7 @@ cron.schedule("*/2 * * * *", async () => {
     const expired = await prisma.booking.updateMany({
       where: {
         status: BookingStatus.PENDING,
-        holdExpiresAt: { lte: new Date() }
+        expiresAt: { lte: new Date() }
       },
       data: { status: BookingStatus.EXPIRED }
     });
