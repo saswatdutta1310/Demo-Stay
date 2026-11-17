@@ -1,0 +1,67 @@
+
+:root {
+  /* Fonts */
+  --font-serif: "Marcellus", serif;
+  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+
+  /* Surface & Base Tones */
+  --c-white: #FFFFFF;
+  --c-satin: #FFFEFD;
+  --c-cream: #FFF9F3;
+  --c-pebble-grey: #EEE8E1;
+  --c-silt: #BBB2A6;
+  --c-wood-grey: #74706A;
+  --c-black: #000000;
+
+  /* Midnight / Deep Slate */
+  --c-mb-10: #151D25;
+  --c-mb-15: #293A49;
+  --c-mb-20: #41525F;
+  --c-mb-30: #5D7587;
+  --c-mb-40: #96ACBD;
+  --c-mb-50: #CDDBE5;
+
+  /* Forest Green */
+  --c-fg-10: #35403B;
+  --c-fg-20: #697A72;
+  --c-fg-30: #A1B2AA;
+  --c-fg-40: #B6C8C0;
+  --c-fg-50: #D2DFD9;
+
+  /* Vineyard Terracotta */
+  --c-vg-10: #8C3F1A;
+  --c-vg-20: #9C4633;
+  --c-vg-25: #A85422;
+  --c-vg-30: #B6522E;
+  --c-vg-40: #E37F3D;
+  --c-vg-50: #EF9D54;
+
+  /* Warm Amber */
+  --c-w-10: #4C2400;
+  --c-w-50: #F6BC2F;
+  --c-w-80: #FFE29D;
+  --c-w-100: #FFF4DA;
+
+  /* Dimensions & Spacing */
+  --header-height: 120px;
+  --header-height-scrolled: 64px;
+  --header-height-mobile: 56px;
+  --gap: 1.6rem;
+  --container-max: 1440px;
+
+  /* Motion Curves */
+  --ease-expo: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-snappy: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-cursor: cubic-bezier(0.3, 0, 0.3, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

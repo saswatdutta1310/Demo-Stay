@@ -1,102 +1,116 @@
-import { getClientConfig } from "@/lib/client-config";
 import "./globals.css";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
-import { DemoBanner } from "@/components/DemoBanner";
 import type { Metadata } from "next";
+import { siteContent } from "@/config/siteContent";
+import { UIProvider } from "@/context/UIContext";
+import { SmoothScroll } from "@/components/global/SmoothScroll";
+import { Preloader } from "@/components/global/Preloader";
+import { CustomCursor } from "@/components/global/CustomCursor";
+import { Header } from "@/components/global/Header";
+import { NavOverlay } from "@/components/global/NavOverlay";
+import { BookingDrawer } from "@/components/global/BookingDrawer";
+import { WalkthroughModal } from "@/components/global/WalkthroughModal";
+import { Footer } from "@/components/global/Footer";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const { config } = getClientConfig();
-  const isDemo = process.env.DEMO_MODE === "true";
-
-  return {
-    title: `${config.name} | ${config.tagline}`,
-    description: `Official direct booking site for ${config.name}. ${config.tagline}`,
-    robots: isDemo
-      ? {
-          index: false,
-          follow: false
-        }
-      : {
-          index: true,
-          follow: true
-        }
-  };
-}
+export const metadata: Metadata = {
+  title: `${siteContent.brand.name} | ${siteContent.brand.subname} in ${siteContent.brand.location}`,
+  description: siteContent.hero.subtitle,
+  keywords: [
+    "The Vineyard Heritage Hotel",
+    "Cape Town Luxury Hotel",
+    "Newlands Cape Town Accommodations",
+    "Table Mountain Hotel",
+    "Vineyard Estate & Spa",
+    "Boutique Hotel South Africa"
+  ],
+  openGraph: {
+    title: `${siteContent.brand.name} | ${siteContent.brand.location}`,
+    description: siteContent.hero.subtitle,
+    url: "https://vineyard.co.za",
+    siteName: siteContent.brand.name,
+    images: [
+      {
+        url: siteContent.hero.bgImage,
+        width: 1200,
+        height: 630,
+        alt: siteContent.brand.name
+      }
+    ],
+    locale: "en_ZA",
+    type: "website"
+  }
+};
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const { config, rooms } = getClientConfig();
-  const isDemo = process.env.DEMO_MODE === "true";
-
-  const themePrimary = config.theme?.primary || "#b45309";
-  const themeAccent = config.theme?.accent || config.theme?.primary || "#b45309";
-  const themeBg = config.theme?.background || "#ffffff";
-  const themeInk = config.theme?.ink || "#1c1917";
-  const fontHeading = config.theme?.fontHeading || "system-ui, sans-serif";
-  const fontBody = config.theme?.fontBody || "system-ui, sans-serif";
-
-  const minPrice = rooms.length > 0 ? Math.min(...rooms.map((r) => r.basePrice)) : 2000;
-  const maxPrice = rooms.length > 0 ? Math.max(...rooms.map((r) => r.basePrice)) : 3500;
-
-  // Schema.org Hotel JSON-LD structured data
+  // Schema.org Hotel JSON-LD structured data for luxury hotel SEO
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Hotel",
-    "name": config.name,
-    "description": config.tagline,
-    "address": {
+    name: siteContent.brand.name,
+    description: siteContent.hero.subtitle,
+    address: {
       "@type": "PostalAddress",
-      "streetAddress": config.contact.address || config.location?.address,
-      "addressLocality": "Bhubaneswar",
-      "postalCode": "751002",
-      "addressRegion": "Odisha",
-      "addressCountry": "IN"
+      streetAddress: siteContent.brand.contact.address,
+      addressLocality: "Cape Town",
+      postalCode: "7700",
+      addressRegion: "Western Cape",
+      addressCountry: "ZA"
     },
-    "geo": {
+    geo: {
       "@type": "GeoCoordinates",
-      "latitude": config.location?.lat || 20.2444,
-      "longitude": config.location?.lng || 85.8358
+      latitude: -33.9806,
+      longitude: 18.4593
     },
-    "telephone": config.contact.phone,
-    "email": config.contact.email,
-    "priceRange": `₹${minPrice} - ₹${maxPrice}`,
-    "checkinTime": "10:30",
-    "checkoutTime": "11:00",
-    "petsAllowed": false
+    telephone: siteContent.brand.contact.phone,
+    email: siteContent.brand.contact.email,
+    priceRange: "$$$$",
+    starRating: {
+      "@type": "Rating",
+      ratingValue: "5"
+    }
   };
 
   return (
     <html lang="en">
       <head>
-        <style
-          dangerouslySetInnerHTML={{
-            __html: `
-              :root {
-                --color-primary: ${themePrimary};
-                --color-accent: ${themeAccent};
-                --color-bg: ${themeBg};
-                --color-ink: ${themeInk};
-                --font-heading: ${fontHeading};
-                --font-body: ${fontBody};
-              }
-            `
-          }}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300..600;1,300..600&family=Marcellus&family=Plus+Jakarta+Sans:wght@300..700&display=swap"
+          rel="stylesheet"
         />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="min-h-screen bg-white text-neutral-900 flex flex-col font-sans">
-        {isDemo && <DemoBanner hotelName={config.name} />}
-        <Header name={config.name} />
-        <main className="flex-1">{children}</main>
-        <Footer
-          name={config.name}
-          address={config.contact.address || config.location?.address || ""}
-          phone={config.contact.phone}
-          email={config.contact.email}
-        />
+      <body className="font-sans bg-cream text-midnight antialiased selection:bg-terracotta selection:text-cream">
+        <UIProvider>
+          <SmoothScroll>
+            {/* Splash intro preloader */}
+            <Preloader />
+
+            {/* Custom follower cursor */}
+            <CustomCursor />
+
+            {/* Sticky Header with 120px -> 64px scroll transformation */}
+            <Header />
+
+            {/* Fullscreen Navigation Drawer */}
+            <NavOverlay />
+
+            {/* 3-Mode Booking Drawer (Sleep / Eat / Meet) */}
+            <BookingDrawer />
+
+            {/* 3D Walkthrough Panorama Modal for Grounds Map */}
+            <WalkthroughModal />
+
+            {/* Main Content */}
+            {children}
+
+            {/* Curtain Parallax Footer */}
+            <Footer />
+          </SmoothScroll>
+        </UIProvider>
       </body>
     </html>
   );

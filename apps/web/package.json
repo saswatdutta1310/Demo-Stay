@@ -12,6 +12,8 @@
   "dependencies": {
     "@hotel-demo/shared": "*",
     "clsx": "^2.1.1",
+    "gsap": "^3.12.5",
+    "lenis": "^1.1.18",
     "lucide-react": "^0.379.0",
     "next": "^14.2.3",
     "react": "^18.3.1",
