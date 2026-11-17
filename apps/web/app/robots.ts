@@ -1,11 +1,23 @@
 import { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
-  // Disallow indexing by default during demo / showcase mode
+  const isDemo = process.env.DEMO_MODE === "true";
+
+  if (isDemo) {
+    return {
+      rules: {
+        userAgent: "*",
+        disallow: "/"
+      }
+    };
+  }
+
   return {
     rules: {
       userAgent: "*",
-      disallow: "/"
-    }
+      allow: "/",
+      disallow: ["/owner", "/owner/*", "/api/*"]
+    },
+    sitemap: "https://demo-stay.com/sitemap.xml"
   };
 }

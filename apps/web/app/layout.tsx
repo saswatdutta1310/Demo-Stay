@@ -25,7 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const { config } = getClientConfig();
+  const { config, rooms } = getClientConfig();
   const isDemo = process.env.DEMO_MODE === "true";
 
   const themePrimary = config.theme?.primary || "#b45309";
@@ -34,6 +34,36 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const themeInk = config.theme?.ink || "#1c1917";
   const fontHeading = config.theme?.fontHeading || "system-ui, sans-serif";
   const fontBody = config.theme?.fontBody || "system-ui, sans-serif";
+
+  const minPrice = rooms.length > 0 ? Math.min(...rooms.map((r) => r.basePrice)) : 2000;
+  const maxPrice = rooms.length > 0 ? Math.max(...rooms.map((r) => r.basePrice)) : 3500;
+
+  // Schema.org Hotel JSON-LD structured data
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Hotel",
+    "name": config.name,
+    "description": config.tagline,
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": config.contact.address || config.location?.address,
+      "addressLocality": "Bhubaneswar",
+      "postalCode": "751002",
+      "addressRegion": "Odisha",
+      "addressCountry": "IN"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": config.location?.lat || 20.2444,
+      "longitude": config.location?.lng || 85.8358
+    },
+    "telephone": config.contact.phone,
+    "email": config.contact.email,
+    "priceRange": `₹${minPrice} - ₹${maxPrice}`,
+    "checkinTime": "10:30",
+    "checkoutTime": "11:00",
+    "petsAllowed": false
+  };
 
   return (
     <html lang="en">
@@ -51,6 +81,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               }
             `
           }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
       <body className="min-h-screen bg-white text-neutral-900 flex flex-col font-sans">
