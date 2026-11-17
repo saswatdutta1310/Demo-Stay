@@ -43,12 +43,12 @@ export function WalkthroughModal() {
     return () => ctx.revert();
   }, [isWalkthroughOpen]);
 
-  if (!currentPin) return null;
+  if (!isWalkthroughOpen || !currentPin) return null;
 
   return (
     <div
       ref={modalRef}
-      className="fixed inset-0 z-[120] invisible opacity-0 bg-mb-10/80 backdrop-blur-md flex items-center justify-center p-4 md:p-8"
+      className="fixed inset-0 z-[120] bg-mb-10/80 backdrop-blur-md flex items-center justify-center p-4 md:p-8 animate-fadeIn"
       role="dialog"
       aria-modal="true"
       aria-label="Estate Walkthrough Modal"

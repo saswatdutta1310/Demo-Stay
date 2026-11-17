@@ -58,10 +58,12 @@ export function NavOverlay() {
     return () => ctx.revert();
   }, [isNavOpen]);
 
+  if (!isNavOpen) return null;
+
   return (
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-[100] invisible opacity-0 bg-mb-10/95 backdrop-blur-2xl text-cream flex flex-col justify-between overflow-y-auto px-6 py-8 md:px-16 md:py-12"
+      className="fixed inset-0 z-[100] bg-mb-10/95 backdrop-blur-2xl text-cream flex flex-col justify-between overflow-y-auto px-6 py-8 md:px-16 md:py-12 animate-fadeIn"
       role="dialog"
       aria-modal="true"
       aria-label="Site Navigation"
