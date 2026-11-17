@@ -29,6 +29,13 @@ jobs:
         run: |
           npm run prisma:generate --if-present
           npm run build:shared
+        env:
+          DATABASE_URL: "file:./dev.db"
+
+      - name: Setup Test Database
+        run: npm run db:push --workspace=@hotel-demo/api
+        env:
+          DATABASE_URL: "file:./dev.db"
 
       - name: Lint
         run: npm run lint
@@ -38,6 +45,8 @@ jobs:
 
       - name: Test
         run: npm run test
+        env:
+          DATABASE_URL: "file:./dev.db"
 
       - name: Validate client configurations
         run: npm run client:validate
